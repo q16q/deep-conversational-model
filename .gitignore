@@ -1,0 +1,9 @@
+.venv/
+.env
+har_and_cookies/
+tmp/
+outputs/
+__pycache__/
+package-lock.json
+node_modules/
+output.wav
