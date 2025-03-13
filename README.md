@@ -2,13 +2,12 @@
 -"**maybe i'm going insane**"  
 > [!NOTE]
 > readme is being overwritten!!
-## requirements:
+## 💫 Requirements:
 - python 3.10.11
 - node.js
-- everything in requirements.txt
-- cuda drivers
-- discord bot
-## setup
+- [**cuda drivers**](https://developer.nvidia.com/cuda-downloads)
+- [discord bot token](https://discord.com/developers)
+## ⚡ Setup
 ```ps1
 python -m venv ./.venv
 ./activate.ps1
@@ -20,7 +19,7 @@ in .env file:
 ```ini
 DISCORD_TOKEN=[token]
 ```
-## usage
+## 🪷 Usage
 **dcm needs two consoles; first for server and second for discord.js bot**  
   
 in first console:
