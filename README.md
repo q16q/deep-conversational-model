@@ -22,13 +22,13 @@ DISCORD_TOKEN=[token]
 ## 🪷 Usage
 **dcm needs two consoles; first for server and second for discord.js bot**  
   
-in first console:
+in the first console:
 ```ps1
 ./activate.ps1
 cd src
 python nodebridge.py
 ```
-in second:
+in the second:
 ```ps1
 cd ts
 npm start
