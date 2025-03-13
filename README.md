@@ -1,4 +1,7 @@
 # Deep Conversational Model
+-"**maybe i'm going insane**"  
+> [!NOTE]
+> readme is being overwritten!!
 ## requirements:
 - python 3.10.11
 - node.js
