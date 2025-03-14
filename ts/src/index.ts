@@ -1,5 +1,5 @@
 import { Client, GatewayIntentBits, Events, Message } from 'discord.js';
-import { joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource } from '@discordjs/voice'
+import { joinVoiceChannel, getVoiceConnection, createAudioPlayer, createAudioResource, JoinVoiceChannelOptions, CreateVoiceConnectionOptions } from '@discordjs/voice'
 import { addSpeechEvent, SpeechEvents, VoiceMessage } from 'discord-speech-recognition';
 import WebSocket from "ws";
 
@@ -17,19 +17,33 @@ const client = new Client({
   ],
 });
 
-const GUILD_ID   = '822899213955760180';
-const CHANNEL_ID = '1349416171312779395';
+import * as config from "../botconfig.json";
+
+const GUILD_ID   = config.GUILDID;
+const CHANNEL_ID = config.CHANNELID;
 
 let working = false;
 let currentSoundInterval: any = 0;
+
+let listeningModes: any = {};
+
 let playGeneratingSound = () => {
-  let fp = '../sounds/generating.mp3';
   if(working) {
     let connection = getVoiceConnection(GUILD_ID);
     let player = createAudioPlayer();
     connection?.subscribe(player)
-    let res = createAudioResource(fp);
+    let res = createAudioResource(config.generatingsound);
     player.play(res)
+  }
+}
+
+let playListeningSound = () => {
+  if(!working) {
+    let connection = getVoiceConnection(GUILD_ID);
+    let player = createAudioPlayer();
+    connection?.subscribe(player);
+    let res = createAudioResource(config.listeningsound)
+    player.play(res);
   }
 }
 
@@ -50,27 +64,22 @@ websocket.on('message', data => {
     }
 });
 
-addSpeechEvent(client, {
-    "lang": "ru",
-    "profanityFilter": false,
-    "ignoreBots": false
-});
-
-client.on(Events.MessageCreate, (msg: Message) => {
-  const voiceChannel = msg.member?.voice.channel;
-  if (voiceChannel) {
-    joinVoiceChannel({
-      channelId: voiceChannel.id,
-      guildId: voiceChannel.guild.id,
-      adapterCreator: voiceChannel.guild.voiceAdapterCreator,
-      selfDeaf: false,
-    });
-  }
-});
+addSpeechEvent(client, config.sttconfig);
 
 client.on(SpeechEvents.speech, (msg: VoiceMessage) => {
   if (!msg.content) return;
-  if (!msg.content.toLowerCase().startsWith('катя')) return;
+
+  if(listeningModes[msg.author.id]) {
+    listeningModes[msg.author.id] = false
+  } else {
+    if (!msg.content.toLowerCase().startsWith('катя')) return;
+  }
+
+  if (msg.content.toLowerCase() == 'катя') {
+    listeningModes[msg.author.id] = true
+    playListeningSound()
+    return;
+  }
 
   if(!working) {
       console.log('detected: ' + msg.content)
@@ -86,6 +95,15 @@ client.on(SpeechEvents.speech, (msg: VoiceMessage) => {
 
 client.on(Events.ClientReady, () => {
   console.log("Ready!");
+  let options: any = {
+    channelId: CHANNEL_ID,
+    guildId: GUILD_ID,
+    selfDeaf: false,
+    selfMute: false
+  }
+  let guild = client.guilds.cache.get(GUILD_ID);
+  if(guild) options.adapterCreator = guild.voiceAdapterCreator;
+  joinVoiceChannel(options);
 });
 
 client.login(process.env.DISCORD_TOKEN);
